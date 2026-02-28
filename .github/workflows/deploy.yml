@@ -77,4 +77,4 @@ jobs:
 
             cd ~/app/chatlab
             IMAGE_TAG=${{ github.sha }} \
-            docker compose -f docker-compose-api.yml up -d --remove-orphans
+            docker compose -f docker-compose.api.yml up -d --remove-orphans
