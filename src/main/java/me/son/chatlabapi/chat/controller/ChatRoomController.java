@@ -4,9 +4,7 @@ import lombok.RequiredArgsConstructor;
 
 import lombok.extern.log4j.Log4j2;
 import me.son.chatlabapi.chat.domain.service.ChatRoomService;
-import me.son.chatlabapi.chat.dto.CreateRoomRequest;
-import me.son.chatlabapi.chat.dto.CreateRoomResponse;
-import me.son.chatlabapi.chat.dto.MyRoomResponse;
+import me.son.chatlabapi.chat.dto.*;
 import me.son.chatlabapi.global.response.ApiResponse;
 import me.son.chatlabapi.global.security.CustomUserDetails;
 
@@ -24,20 +22,36 @@ public class ChatRoomController {
 
     @PostMapping
     public ApiResponse<CreateRoomResponse> createRoom(@RequestBody CreateRoomRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
-        log.info("createRoom refreshToken: {}, {}", userDetails.getId(), request.name());
+        log.info("createRoom - user {} creates new room named {}", userDetails.getId(), request.name());
         CreateRoomResponse response = chatRoomService.createRoom(userDetails.getId(), request.name());
         return ApiResponse.success(response);
     }
 
     @GetMapping
     public ApiResponse<List<MyRoomResponse>> getMyRooms(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("getMyRooms - user {} gets his rooms", userDetails.getId());
         List<MyRoomResponse> response = chatRoomService.getMyRooms(userDetails.getId());
         return ApiResponse.success(response);
     }
 
     @DeleteMapping("/{roomId}")
     public ApiResponse<Void> leaveRoom(@PathVariable Long roomId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("leaveRoom - user {} leaves the room {}", userDetails.getId(), roomId);
         chatRoomService.leaveRoom(userDetails.getId(), roomId);
         return ApiResponse.success(null);
+    }
+
+    @PostMapping("/{roomId}/members")
+    public ApiResponse<Void> inviteMember(@PathVariable Long roomId, @RequestBody InviteMemberRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("leaveRoom - user {} invites user {} to the room {}", userDetails.getId(), request.username(), roomId);
+        chatRoomService.inviteMember(userDetails.getId(), roomId, request.username());
+        return ApiResponse.success(null);
+    }
+
+    @GetMapping("/{roomId}/members")
+    public ApiResponse<List<RoomMemberResponse>> getRoomMembers(@PathVariable Long roomId, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("getRoomMembers - user {} gets members in the room {}", userDetails.getId(), roomId);
+        List<RoomMemberResponse> response = chatRoomService.getRoomMembers(userDetails.getId(), roomId);
+        return ApiResponse.success(response);
     }
 }
