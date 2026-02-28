@@ -76,5 +76,4 @@ jobs:
             docker pull ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
 
             cd ~/app/chatlab
-            IMAGE_TAG=${{ github.sha }} \
-            docker compose -f docker-compose.api.yml up -d --remove-orphans
+            IMAGE_TAG=${{ github.sha }} docker compose -f docker-compose.api.yml up -d --remove-orphans
