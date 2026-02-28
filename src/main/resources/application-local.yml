@@ -1,0 +1,34 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    url: jdbc:h2:mem:chatlab
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+user:
+  admin:
+    username: admin
+    password: 1234
+
+jwt:
+  secret-key: "local-dev-secret-key-change-in-prod"
+  expiration:
+    access: 600000
+    refresh: 864000000
