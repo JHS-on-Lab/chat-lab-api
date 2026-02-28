@@ -28,6 +28,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
+                .cors(cors -> {})
                 // CSRF 보호 비활성화 (REST API에서는 토큰으로 보호하므로 불필요)
                 .csrf(AbstractHttpConfigurer::disable)
                 // JWT 기반 무상태 인증 방식 사용 -> 세션을 생성하지 않음
