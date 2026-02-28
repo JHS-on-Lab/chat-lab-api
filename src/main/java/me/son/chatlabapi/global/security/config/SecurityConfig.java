@@ -38,9 +38,8 @@ public class SecurityConfig {
                 // HTTP 요청에 대한 인가 규칙 설정
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 // JwtFilter 에서는 통과, 그 이후 Security 에서 발생하는 예외 처리

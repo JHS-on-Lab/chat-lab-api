@@ -1,10 +1,13 @@
 package me.son.chatlabapi.user.domain.entity;
 
 import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+
 import me.son.chatlabapi.user.domain.entity.enums.Role;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -35,5 +38,14 @@ public class User {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    protected User() {}
+    protected User() {
+    }
+
+    public void updateUsername(String username) {
+        this.username = username;
+    }
+
+    public void updatePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
 }

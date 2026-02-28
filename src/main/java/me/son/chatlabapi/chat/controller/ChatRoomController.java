@@ -54,4 +54,20 @@ public class ChatRoomController {
         List<RoomMemberResponse> response = chatRoomService.getRoomMembers(userDetails.getId(), roomId);
         return ApiResponse.success(response);
     }
+
+
+    @GetMapping("/{roomId}/messages")
+    public ApiResponse<MessageSliceResponse> getMessages(@PathVariable Long roomId, @RequestParam(required = false) Long cursor, @RequestParam(defaultValue = "20") int size, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("getMessages - user {} gets messages in the room {}", userDetails.getId(), roomId);
+        MessageSliceResponse response = chatRoomService.getMessages(roomId, cursor, size, userDetails.getId());
+        return ApiResponse.success(response);
+    }
+
+    @PostMapping("/{roomId}/messages")
+    public ApiResponse<MessageResponse> sendMessage(@PathVariable Long roomId, @RequestBody SendMessageRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("sendMessage - user {} sends the message in the room {}", userDetails.getId(), roomId);
+        MessageResponse response = chatRoomService.sendMessage(roomId, userDetails.getId(), request);
+
+        return ApiResponse.success(response);
+    }
 }

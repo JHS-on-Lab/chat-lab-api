@@ -1,8 +1,6 @@
 package me.son.chatlabapi.chat.domain.service;
 
-import me.son.chatlabapi.chat.dto.CreateRoomResponse;
-import me.son.chatlabapi.chat.dto.MyRoomResponse;
-import me.son.chatlabapi.chat.dto.RoomMemberResponse;
+import me.son.chatlabapi.chat.dto.*;
 
 import java.util.List;
 
@@ -12,4 +10,6 @@ public interface ChatRoomService {
     void leaveRoom(Long id, Long roomId);
     void inviteMember(Long inviterId, Long roomId, String username);
     List<RoomMemberResponse> getRoomMembers(Long userId, Long roomId);
+    MessageSliceResponse getMessages(Long roomId, Long cursor, int size, Long userId);
+    MessageResponse sendMessage(Long roomId, Long userId, SendMessageRequest request);
 }

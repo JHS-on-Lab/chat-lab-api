@@ -1,9 +1,6 @@
 package me.son.chatlabapi.user.domain.service;
 
-import me.son.chatlabapi.user.dto.UserSearchRequestDto;
-import me.son.chatlabapi.user.dto.UserSearchResponseDto;
-import me.son.chatlabapi.user.dto.UserSignUpRequestDto;
-import me.son.chatlabapi.user.dto.UserSignUpResponseDto;
+import me.son.chatlabapi.user.dto.*;
 import org.springframework.data.domain.Page;
 
 public interface UserService {
@@ -39,4 +36,12 @@ public interface UserService {
      * @return 등록된 사용자 정보
      */
     UserSignUpResponseDto addUser(UserSignUpRequestDto request);
+
+    /**
+     * 기존 사용자 정보를 변경한다.
+     *
+     * @param request 변경하려는 사용자 정보
+     * @return 변경된 사용자 정보
+     */
+    UserModifyResponseDto modifyUser(Long userId, UserModifyRequestDto request);
 }
