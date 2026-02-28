@@ -25,6 +25,12 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
+    public UserSearchResponseDto getUserById(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+        return UserSearchResponseDto.from(user);
+    }
+
+    @Override
     public Page<UserSearchResponseDto> getUsers(UserSearchRequestDto request) {
         Pageable pageable = PageRequest.of(
                 request.getPage(),
