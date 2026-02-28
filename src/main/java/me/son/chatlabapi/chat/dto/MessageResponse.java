@@ -13,6 +13,25 @@ public record MessageResponse(
         ChatMessageType type,
         LocalDateTime createdAt
 ) {
+
+    public static MessageResponse of(
+            Long id,
+            Long senderId,
+            String senderName,
+            String content,
+            ChatMessageType type,
+            LocalDateTime createdAt
+    ) {
+        return new MessageResponse(
+                id,
+                senderId,
+                senderName,
+                content,
+                type,
+                createdAt
+        );
+    }
+
     public static MessageResponse from(ChatMessage message) {
         return new MessageResponse(
                 message.getId(),

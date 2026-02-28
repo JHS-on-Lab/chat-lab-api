@@ -47,4 +47,13 @@ public class ChatMessage {
         this.type = type;
         this.content = content;
     }
+
+    public static ChatMessage create(ChatRoom room, User sender, ChatMessageType type, String content) {
+        ChatMessage message = new ChatMessage();
+        message.room = room;
+        message.sender = sender;
+        message.type = type;
+        message.content = content;
+        return message;
+    }
 }

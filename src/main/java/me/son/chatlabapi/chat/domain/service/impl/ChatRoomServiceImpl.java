@@ -8,7 +8,7 @@ import me.son.chatlabapi.chat.domain.repository.ChatMessageRepository;
 import me.son.chatlabapi.chat.domain.repository.ChatRoomMemberRepository;
 import me.son.chatlabapi.chat.domain.repository.ChatRoomRepository;
 import me.son.chatlabapi.chat.dto.*;
-import me.son.chatlabapi.chat.exception.ChatRoomErrorCode;
+import me.son.chatlabapi.chat.exception.ChatErrorCode;
 import me.son.chatlabapi.chat.domain.service.ChatRoomService;
 import me.son.chatlabapi.global.exception.BusinessException;
 import me.son.chatlabapi.user.domain.entity.User;
@@ -18,7 +18,6 @@ import me.son.chatlabapi.user.exception.UserErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -32,7 +31,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Override
     public CreateRoomResponse createRoom(Long userId, String roomName) {
         if (roomName == null || roomName.isBlank()) {
-            throw new BusinessException(ChatRoomErrorCode.INVALID_ROOM_NAME);
+            throw new BusinessException(ChatErrorCode.INVALID_ROOM_NAME);
         }
 
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
@@ -75,10 +74,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
         ChatRoom room = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new BusinessException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ChatErrorCode.CHAT_ROOM_NOT_FOUND));
 
         ChatRoomMember membership = chatRoomMemberRepository.findByUserAndRoom(user, room)
-                .orElseThrow(() -> new BusinessException(ChatRoomErrorCode.NOT_A_ROOM_MEMBER));
+                .orElseThrow(() -> new BusinessException(ChatErrorCode.NOT_ROOM_MEMBER));
 
         // 멤버 삭제
         chatRoomMemberRepository.delete(membership);

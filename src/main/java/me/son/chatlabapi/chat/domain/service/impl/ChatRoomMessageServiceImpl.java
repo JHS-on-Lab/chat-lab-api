@@ -1,6 +1,7 @@
 package me.son.chatlabapi.chat.domain.service.impl;
 
 import lombok.RequiredArgsConstructor;
+
 import me.son.chatlabapi.chat.domain.entity.ChatMessage;
 import me.son.chatlabapi.chat.domain.entity.ChatRoom;
 import me.son.chatlabapi.chat.domain.entity.enums.ChatMessageType;
@@ -11,20 +12,22 @@ import me.son.chatlabapi.chat.domain.service.ChatRoomMessageService;
 import me.son.chatlabapi.chat.dto.MessageResponse;
 import me.son.chatlabapi.chat.dto.MessageSliceResponse;
 import me.son.chatlabapi.chat.dto.SendMessageRequest;
-import me.son.chatlabapi.chat.exception.ChatRoomErrorCode;
+import me.son.chatlabapi.chat.exception.ChatErrorCode;
 import me.son.chatlabapi.global.exception.BusinessException;
 import me.son.chatlabapi.user.domain.entity.User;
 import me.son.chatlabapi.user.domain.repository.UserRepository;
-import me.son.chatlabapi.user.exception.UserErrorCode;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ChatRoomMessageServiceImpl implements ChatRoomMessageService {
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
@@ -33,12 +36,7 @@ public class ChatRoomMessageServiceImpl implements ChatRoomMessageService {
 
     @Override
     public MessageSliceResponse getMessages(Long roomId, Long cursor, int size, Long userId) {
-        ChatRoom room = chatRoomRepository.findById(roomId).orElseThrow(() -> new BusinessException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND));
-
-        boolean isMember = chatRoomMemberRepository.existsByRoomIdAndUserId(roomId, userId);
-        if (!isMember) {
-            throw new BusinessException(ChatRoomErrorCode.NOT_A_ROOM_MEMBER);
-        }
+        validateRoomMember(roomId, userId);
 
         Pageable pageable = PageRequest.of(0, size);
 
@@ -56,23 +54,22 @@ public class ChatRoomMessageServiceImpl implements ChatRoomMessageService {
         return new MessageSliceResponse(dtoList, hasNext, nextCursor);
     }
 
+    @Transactional
     @Override
     public MessageResponse sendMessage(Long roomId, Long userId, SendMessageRequest request) {
-        ChatRoom room = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new BusinessException(ChatRoomErrorCode.CHAT_ROOM_NOT_FOUND));
+        validateRoomMember(roomId, userId);
 
-        boolean isMember = chatRoomMemberRepository.existsByRoomIdAndUserId(roomId, userId);
-
-        if (!isMember) {
-            throw new BusinessException(ChatRoomErrorCode.NOT_A_ROOM_MEMBER);
+        ChatMessageType type;
+        try {
+            type = ChatMessageType.valueOf(request.type().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException(ChatErrorCode.INVALID_MESSAGE_TYPE);
         }
 
-        User sender = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+        ChatRoom room = chatRoomRepository.getReferenceById(roomId);
+        User sender = userRepository.getReferenceById(userId);
 
-        ChatMessageType type = ChatMessageType.valueOf(request.type());
-
-        ChatMessage message = new ChatMessage(
+        ChatMessage message = ChatMessage.create(
                 room,
                 sender,
                 type,
@@ -81,6 +78,20 @@ public class ChatRoomMessageServiceImpl implements ChatRoomMessageService {
 
         ChatMessage saved = chatMessageRepository.save(message);
 
-        return MessageResponse.from(saved);
+        // Lazy 안전: sender.getUsername() 직접 사용
+        return MessageResponse.of(
+                saved.getId(),
+                userId,
+                sender.getUsername(),
+                saved.getContent(),
+                saved.getType(),
+                saved.getCreatedAt()
+        );
+    }
+
+    private void validateRoomMember(Long roomId, Long userId) {
+        if (!chatRoomMemberRepository.existsByRoomIdAndUserId(roomId, userId)) {
+            throw new BusinessException(ChatErrorCode.NOT_ROOM_MEMBER);
+        }
     }
 }
