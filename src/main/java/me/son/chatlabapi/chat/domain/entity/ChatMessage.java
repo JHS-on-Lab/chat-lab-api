@@ -10,7 +10,7 @@ import me.son.chatlabapi.user.domain.entity.User;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "chat_message", indexes = {@Index(name = "idx_room_id_id_desc", columnList = "room_id, id DESC")})
+@Table(name = "chat_messages", indexes = {@Index(name = "idx_room_id_id_desc", columnList = "room_id, id DESC")})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatMessage {
