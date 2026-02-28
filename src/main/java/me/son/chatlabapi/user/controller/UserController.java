@@ -10,6 +10,7 @@ import me.son.chatlabapi.user.dto.UserSearchResponseDto;
 import me.son.chatlabapi.user.dto.UserSignUpRequestDto;
 import me.son.chatlabapi.user.dto.UserSignUpResponseDto;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Log4j2
@@ -37,6 +38,13 @@ public class UserController {
     public ApiResponse<UserSignUpResponseDto> addUser(@RequestBody UserSignUpRequestDto request) {
         log.info("addUser request: {}", request);
         UserSignUpResponseDto user = userService.addUser(request);
+        return ApiResponse.success(user);
+    }
+
+    @GetMapping("/me")
+    public ApiResponse<UserSearchResponseDto> getMyInfo(@AuthenticationPrincipal(expression = "username") String username) {
+        log.info("getMyInfo username: {}", username);
+        UserSearchResponseDto user = userService.getUserByUsername(username);
         return ApiResponse.success(user);
     }
 }
