@@ -2,6 +2,8 @@ package me.son.chatlabapi.global.bootstrap;
 
 import lombok.RequiredArgsConstructor;
 
+import me.son.chatlabapi.game.domain.entity.Game;
+import me.son.chatlabapi.game.domain.repository.GameRepository;
 import me.son.chatlabapi.global.config.AdminProperties;
 import me.son.chatlabapi.user.domain.entity.User;
 import me.son.chatlabapi.user.domain.entity.enums.Role;
@@ -17,10 +19,11 @@ import static me.son.chatlabapi.user.mapper.UserMapper.toEntity;
 
 @Component
 @RequiredArgsConstructor
-public class AdminInitializer implements ApplicationRunner {
+public class DataInitializer implements ApplicationRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AdminProperties adminProperties;
+    private final GameRepository gameRepository;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -35,9 +38,12 @@ public class AdminInitializer implements ApplicationRunner {
                 .username(username)
                 .password(password)
                 .role(Role.ROLE_ADMIN)
-                .build(), passwordEncoder)
-        ;
-
+                .build(), passwordEncoder);
         userRepository.save(user);
+
+        Game game = new Game();
+        game.setName("dodge");
+        game.setActive(true);
+        gameRepository.save(game);
     }
 }
