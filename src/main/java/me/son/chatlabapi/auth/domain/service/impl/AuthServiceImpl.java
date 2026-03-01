@@ -31,7 +31,6 @@ public class AuthServiceImpl implements AuthService {
         } catch (BadCredentialsException e) {
             throw new BusinessException(AuthErrorCode.INVALID_CREDENTIALS);
         } catch (AuthenticationException e) {
-            e.printStackTrace();
             throw new BusinessException(AuthErrorCode.UNAUTHORIZED);
         }
     }
