@@ -33,6 +33,7 @@ public class CustomAuthenticationEntryPoint extends AbstractSecurityErrorHandler
         } else {
             // 일반 인증 실패 (토큰 없음, 잘못된 인증 등)
             log.warn("Auth Error: {}", authException.getMessage());
+            authException.printStackTrace();
             AuthErrorCode errorCode = AuthErrorCode.UNAUTHORIZED;
             writeErrorResponse(response, errorCode);
         }
