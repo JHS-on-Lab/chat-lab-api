@@ -30,7 +30,7 @@ public class ChatMessage {
     @Column(nullable = false)
     private ChatMessageType type;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "MEDIUMTEXT")
     private String content;   // TEXT: 실제 내용 / IMAGE: 이미지 URL
 
     @Column(nullable = false, updatable = false)
