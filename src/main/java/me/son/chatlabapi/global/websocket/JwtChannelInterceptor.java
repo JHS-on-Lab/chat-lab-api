@@ -46,7 +46,7 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
             try {
                 CustomUserDetails userDetails = jwtService.getCustomUserDetails(token);
 
-                Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails.getId(), null, userDetails.getAuthorities());
                 accessor.setUser(authentication);
             } catch (CustomJwtException e) {
                 log.error("WebSocket JWT validation failed", e);

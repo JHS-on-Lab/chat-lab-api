@@ -7,6 +7,7 @@ import me.son.chatlabapi.chat.domain.entity.ChatRoomMember;
 import me.son.chatlabapi.chat.domain.repository.ChatRoomMemberRepository;
 import me.son.chatlabapi.chat.domain.repository.ChatRoomRepository;
 import me.son.chatlabapi.chat.domain.service.ChatRoomMemberService;
+import me.son.chatlabapi.chat.dto.RoomInvitePayload;
 import me.son.chatlabapi.chat.dto.RoomMemberResponse;
 import me.son.chatlabapi.chat.exception.ChatErrorCode;
 import me.son.chatlabapi.global.exception.BusinessException;
@@ -14,6 +15,7 @@ import me.son.chatlabapi.user.domain.entity.User;
 import me.son.chatlabapi.user.domain.repository.UserRepository;
 import me.son.chatlabapi.user.exception.UserErrorCode;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +27,9 @@ public class ChatRoomMemberServiceImpl implements ChatRoomMemberService {
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
+    @Transactional
     @Override
     public void inviteMember(Long inviterId, Long roomId, String username) {
         User inviter = userRepository.findById(inviterId)
@@ -53,6 +57,8 @@ public class ChatRoomMemberServiceImpl implements ChatRoomMemberService {
         ChatRoomMember newMember = new ChatRoomMember(target, room);
 
         chatRoomMemberRepository.save(newMember);
+
+        messagingTemplate.convertAndSendToUser(target.getId().toString(), "/queue/rooms", new RoomInvitePayload(roomId));
     }
 
     @Override
