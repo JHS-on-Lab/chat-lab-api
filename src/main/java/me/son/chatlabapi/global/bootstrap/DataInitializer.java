@@ -30,20 +30,21 @@ public class DataInitializer implements ApplicationRunner {
         String username = adminProperties.getUsername();
         String password = adminProperties.getPassword();
 
-        if (userRepository.existsByUsername(username)) {
-            return;
+        if (!userRepository.existsByUsername(username)) {
+            User user = toEntity(UserSignUpRequestDto.builder()
+                    .username(username)
+                    .password(password)
+                    .role(Role.ROLE_ADMIN)
+                    .build(), passwordEncoder);
+            userRepository.save(user);
         }
 
-        User user = toEntity(UserSignUpRequestDto.builder()
-                .username(username)
-                .password(password)
-                .role(Role.ROLE_ADMIN)
-                .build(), passwordEncoder);
-        userRepository.save(user);
+        if (!gameRepository.existsById("dodge")) {
+            Game game = new Game();
+            game.setName("dodge");
+            game.setActive(true);
+            gameRepository.save(game);
+        }
 
-        Game game = new Game();
-        game.setName("dodge");
-        game.setActive(true);
-        gameRepository.save(game);
     }
 }
