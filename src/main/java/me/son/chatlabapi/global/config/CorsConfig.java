@@ -15,7 +15,8 @@ public class CorsConfig {
                 registry.addMapping("/**")
                         .allowedOrigins(
                                 "http://localhost:5173",
-                                "http://ec2-3-37-109-244.ap-northeast-2.compute.amazonaws.com"
+                                "http://ec2-3-37-109-244.ap-northeast-2.compute.amazonaws.com",
+                                "https://chatlab-ms.duckdns.org"
                         )
                         .allowedMethods("*")
                         .allowedHeaders("*")
