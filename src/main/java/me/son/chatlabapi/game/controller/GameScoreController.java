@@ -35,7 +35,6 @@ public class GameScoreController {
                 .stream()
                 .map(ScoreResponse::from)
                 .toList();
-
         return ApiResponse.success(result);
     }
 }

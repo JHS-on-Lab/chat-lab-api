@@ -1,9 +1,12 @@
 package me.son.chatlabapi.game.domain.entity;
 
 import jakarta.persistence.*;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import me.son.chatlabapi.user.domain.entity.User;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 

@@ -1,6 +1,7 @@
 package me.son.chatlabapi.game.domain.service.impl;
 
 import lombok.RequiredArgsConstructor;
+
 import me.son.chatlabapi.game.domain.entity.Game;
 import me.son.chatlabapi.game.domain.entity.GameScore;
 import me.son.chatlabapi.game.domain.repository.GameRepository;
@@ -11,7 +12,7 @@ import me.son.chatlabapi.global.exception.BusinessException;
 import me.son.chatlabapi.user.domain.entity.User;
 import me.son.chatlabapi.user.domain.repository.UserRepository;
 import me.son.chatlabapi.user.exception.UserErrorCode;
-import org.springframework.data.domain.PageRequest;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
