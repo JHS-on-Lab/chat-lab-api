@@ -1,6 +1,7 @@
 package me.son.chatlabapi.global.response;
 
 import lombok.Getter;
+import me.son.chatlabapi.global.exception.ErrorCode;
 
 @Getter
 public class ApiResponse<T> {
@@ -18,6 +19,10 @@ public class ApiResponse<T> {
 
     public static <T> ApiResponse<T> success(T data) {
         return new ApiResponse<>(true, data, null, null);
+    }
+
+    public static ApiResponse<Void> failure(ErrorCode errorCode) {
+        return new ApiResponse<>(false, null, errorCode.getCode(), errorCode.getMessage());
     }
 
     public static ApiResponse<Void> failure(String errorCode, String message) {

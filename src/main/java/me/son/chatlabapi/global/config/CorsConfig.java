@@ -1,27 +1,22 @@
 package me.son.chatlabapi.global.config;
 
-import org.springframework.context.annotation.Bean;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class CorsConfig {
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOrigins(
-                                "http://localhost:5173",
-                                "http://ec2-3-37-109-244.ap-northeast-2.compute.amazonaws.com",
-                                "https://chatlab-ms.duckdns.org"
-                        )
-                        .allowedMethods("*")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
-            }
-        };
+@RequiredArgsConstructor
+public class CorsConfig implements WebMvcConfigurer {
+    private final CorsProperties corsProperties;
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins(corsProperties.allowedOrigins().toArray(String[]::new))
+                .allowedMethods("*")
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 }

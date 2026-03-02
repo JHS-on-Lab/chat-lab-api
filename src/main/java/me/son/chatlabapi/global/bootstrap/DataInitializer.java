@@ -15,6 +15,9 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static me.son.chatlabapi.user.mapper.UserMapper.toEntity;
 
 @Component
@@ -27,8 +30,8 @@ public class DataInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        String username = adminProperties.getUsername();
-        String password = adminProperties.getPassword();
+        String username = adminProperties.username();
+        String password = adminProperties.password();
 
         if (!userRepository.existsByUsername(username)) {
             User user = toEntity(UserSignUpRequestDto.builder()
@@ -39,12 +42,16 @@ public class DataInitializer implements ApplicationRunner {
             userRepository.save(user);
         }
 
-        if (!gameRepository.existsById("dodge")) {
-            Game game = new Game();
-            game.setName("dodge");
-            game.setActive(true);
-            gameRepository.save(game);
-        }
+        List<String> gameList = new ArrayList<>();
+        gameList.add("dodge");
 
+        for (String game : gameList) {
+            if (!gameRepository.existsById(game)) {
+                Game g = new Game();
+                g.setName(game);
+                g.setActive(true);
+                gameRepository.save(g);
+            }
+        }
     }
 }

@@ -31,3 +31,9 @@ jwt:
   expiration:
     access: 600000
     refresh: 864000000
+
+app:
+  cors:
+    allowed-origins:
+#      - http://ec2-3-37-109-244.ap-northeast-2.compute.amazonaws.com
+      - https://chatlab-ms.duckdns.org

@@ -7,6 +7,7 @@ import me.son.chatlabapi.auth.jwt.exception.CustomJwtException;
 import me.son.chatlabapi.auth.jwt.exception.JwtErrorCode;
 import me.son.chatlabapi.auth.jwt.service.JwtService;
 import me.son.chatlabapi.global.security.CustomUserDetails;
+
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -45,7 +46,6 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
 
             try {
                 CustomUserDetails userDetails = jwtService.getCustomUserDetails(token);
-
                 Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails.getId(), null, userDetails.getAuthorities());
                 accessor.setUser(authentication);
             } catch (CustomJwtException e) {
@@ -53,7 +53,6 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
                 throw e;
             }
         }
-
         return message;
     }
 }

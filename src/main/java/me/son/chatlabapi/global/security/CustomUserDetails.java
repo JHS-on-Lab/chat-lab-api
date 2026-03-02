@@ -3,7 +3,9 @@ package me.son.chatlabapi.global.security;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+
 import me.son.chatlabapi.user.domain.entity.enums.Role;
+
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

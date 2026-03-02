@@ -1,7 +1,9 @@
 package me.son.chatlabapi.global.websocket.config;
 
 import lombok.RequiredArgsConstructor;
+
 import me.son.chatlabapi.global.websocket.JwtChannelInterceptor;
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;

@@ -1,10 +1,14 @@
 package me.son.chatlabapi.global.security.handler;
 
 import jakarta.servlet.http.HttpServletResponse;
+
 import lombok.RequiredArgsConstructor;
+
 import me.son.chatlabapi.global.exception.ErrorCode;
 import me.son.chatlabapi.global.response.ApiResponse;
+
 import org.springframework.http.MediaType;
+
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -19,7 +23,7 @@ public abstract class AbstractSecurityErrorHandler {
             return;
         }
 
-        ApiResponse<Void> errorResponse = ApiResponse.failure(errorCode.getCode(), errorCode.getMessage());
+        ApiResponse<Void> errorResponse = ApiResponse.failure(errorCode);
 
         response.setStatus(errorCode.getStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
