@@ -40,6 +40,7 @@ public class DataInitializer implements ApplicationRunner {
 
         List<String> gameList = new ArrayList<>();
         gameList.add("dodge");
+        gameList.add("grid-rush");
 
         for (String game : gameList) {
             if (!gameRepository.existsById(game)) {
