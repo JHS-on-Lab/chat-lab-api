@@ -2,12 +2,13 @@ package me.son.chatlabapi.chat.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+
 import me.son.chatlabapi.chat.domain.service.ChatRoomMemberService;
-import me.son.chatlabapi.chat.domain.service.ChatRoomService;
 import me.son.chatlabapi.chat.dto.InviteMemberRequest;
 import me.son.chatlabapi.chat.dto.RoomMemberResponse;
 import me.son.chatlabapi.global.response.ApiResponse;
 import me.son.chatlabapi.global.security.CustomUserDetails;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 

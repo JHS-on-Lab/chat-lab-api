@@ -30,7 +30,6 @@ public class ChatMessageController {
     public ApiResponse<MessageResponse> sendMessage(@PathVariable Long roomId, @RequestBody SendMessageRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
         log.info("sendMessage - user {} sends the message in the room {}", userDetails.getId(), roomId);
         MessageResponse response = chatRoomMessageService.sendMessage(roomId, userDetails.getId(), request);
-
         return ApiResponse.success(response);
     }
 }

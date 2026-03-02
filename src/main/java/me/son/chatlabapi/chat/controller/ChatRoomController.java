@@ -41,6 +41,4 @@ public class ChatRoomController {
         chatRoomService.leaveRoom(userDetails.getId(), roomId);
         return ApiResponse.success(null);
     }
-
-
 }

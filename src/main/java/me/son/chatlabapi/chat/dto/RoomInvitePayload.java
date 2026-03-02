@@ -1,3 +1,6 @@
 package me.son.chatlabapi.chat.dto;
 
-public record RoomInvitePayload(Long roomId) {}
+public record RoomInvitePayload(
+        Long roomId
+) {
+}
