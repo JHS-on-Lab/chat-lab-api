@@ -1,17 +1,17 @@
 package me.son.chatlabapi.auth.jwt;
 
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import me.son.chatlabapi.auth.jwt.dto.ParsedToken;
+
 import me.son.chatlabapi.auth.jwt.exception.CustomJwtException;
 import me.son.chatlabapi.auth.jwt.service.JwtService;
 import me.son.chatlabapi.global.security.CustomUserDetails;
-import me.son.chatlabapi.user.domain.entity.enums.Role;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;

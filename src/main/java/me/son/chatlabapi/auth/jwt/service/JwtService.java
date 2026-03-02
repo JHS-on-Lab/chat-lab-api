@@ -1,15 +1,18 @@
 package me.son.chatlabapi.auth.jwt.service;
 
 import io.jsonwebtoken.Claims;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import me.son.chatlabapi.auth.dto.JwtDto;
+
+import me.son.chatlabapi.auth.jwt.dto.JwtDto;
 import me.son.chatlabapi.auth.jwt.JwtProvider;
 import me.son.chatlabapi.auth.jwt.dto.ParsedToken;
 import me.son.chatlabapi.auth.jwt.exception.CustomJwtException;
 import me.son.chatlabapi.auth.jwt.exception.JwtErrorCode;
 import me.son.chatlabapi.global.security.CustomUserDetails;
 import me.son.chatlabapi.user.domain.entity.enums.Role;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -27,17 +30,13 @@ public class JwtService {
     /**
      * 인증된 사용자 정보를 기반으로 JWT 토큰을 생성한다.
      *
-     * @param id 토큰에 포함될 사용자 식별자
+     * @param id       토큰에 포함될 사용자 식별자
      * @param username 토큰 클레임에 포함될 사용자명
      * @param role     토큰 클레임에 포함될 사용자 권한 정보
      * @return 생성된 JWT 토큰 정보
      */
     public JwtDto createTokens(Long id, String username, Role role) {
-        return JwtDto.builder()
-                .accessToken(jwtProvider.createToken(id, username, role, accessTokenExpirationMs))
-                .refreshToken(jwtProvider.createToken(id, refreshTokenExpirationMs))
-                .build()
-                ;
+        return new JwtDto(jwtProvider.createToken(id, username, role, accessTokenExpirationMs), jwtProvider.createToken(id, refreshTokenExpirationMs));
     }
 
     /**
@@ -49,7 +48,7 @@ public class JwtService {
     public Long getSubject(String token) {
         try {
             ParsedToken parsed = jwtProvider.parseToken(token);
-            return Long.valueOf(parsed.getSubject());
+            return Long.valueOf(parsed.subject());
         } catch (Exception e) {
             throw new CustomJwtException(JwtErrorCode.JWT_INVALID);
         }
@@ -65,8 +64,8 @@ public class JwtService {
         try {
             // 파싱 및 검증
             ParsedToken parsed = jwtProvider.parseToken(token);
-            Long id = Long.valueOf(parsed.getSubject());
-            Claims claims = parsed.getClaims();
+            Long id = Long.valueOf(parsed.subject());
+            Claims claims = parsed.claims();
             String username = claims.get("username", String.class);
             Role role = Role.valueOf(claims.get("role", String.class));
 

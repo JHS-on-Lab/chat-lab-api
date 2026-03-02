@@ -1,6 +1,7 @@
 package me.son.chatlabapi.auth.exception;
 
 import me.son.chatlabapi.global.exception.ErrorCode;
+
 import org.springframework.http.HttpStatus;
 
 public enum AuthErrorCode implements ErrorCode {

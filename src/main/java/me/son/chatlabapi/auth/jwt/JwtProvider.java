@@ -2,11 +2,14 @@ package me.son.chatlabapi.auth.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+
 import jakarta.annotation.PostConstruct;
+
 import me.son.chatlabapi.auth.jwt.dto.ParsedToken;
 import me.son.chatlabapi.auth.jwt.exception.CustomJwtException;
 import me.son.chatlabapi.auth.jwt.exception.JwtErrorCode;
 import me.son.chatlabapi.user.domain.entity.enums.Role;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -59,11 +62,7 @@ public class JwtProvider {
                     .build()
                     .parseSignedClaims(token);
 
-            return ParsedToken.builder()
-                    .subject(jws.getPayload().getSubject())
-                    .claims(jws.getPayload())
-                    .build()
-                    ;
+            return new ParsedToken(jws.getPayload().getSubject(), jws.getPayload());
 
         } catch (ExpiredJwtException e) {
             throw new CustomJwtException(JwtErrorCode.JWT_EXPIRED);
