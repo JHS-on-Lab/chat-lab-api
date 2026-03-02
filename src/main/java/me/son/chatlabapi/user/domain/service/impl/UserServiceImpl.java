@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 
 import me.son.chatlabapi.global.exception.BusinessException;
 import me.son.chatlabapi.user.domain.entity.User;
-import me.son.chatlabapi.user.domain.entity.enums.Role;
 import me.son.chatlabapi.user.domain.repository.UserRepository;
 import me.son.chatlabapi.user.domain.service.UserService;
 import me.son.chatlabapi.user.dto.*;
@@ -25,39 +24,36 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public UserSearchResponseDto getUserById(Long id) {
+    public UserSearchResponse getUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
-        return UserSearchResponseDto.from(user);
+        return UserSearchResponse.from(user);
     }
 
     @Override
-    public Page<UserSearchResponseDto> getUsers(UserSearchRequestDto request) {
+    public Page<UserSearchResponse> getUsers(UserSearchRequest request) {
         Pageable pageable = PageRequest.of(
-                request.getPage(),
-                request.getSize()
+                request.page(),
+                request.size()
         );
 
-        return userRepository.findAll(pageable)
-                .map(UserSearchResponseDto::from);
+        return userRepository.findAll(pageable).map(UserSearchResponse::from);
     }
 
     @Override
-    public UserSearchResponseDto getUserByUsername(String username) {
+    public UserSearchResponse getUserByUsername(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
-        return UserSearchResponseDto.from(user);
+        return UserSearchResponse.from(user);
     }
 
     @Override
-    public UserSignUpResponseDto addUser(UserSignUpRequestDto request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
+    public UserSignUpResponse addUser(UserSignUpRequest request) {
+        if (userRepository.existsByUsername(request.username())) {
             throw new BusinessException(UserErrorCode.DUPLICATE_USERNAME);
         }
 
-        request.setRole(Role.ROLE_USER);
-
         try {
             User user = userRepository.save(UserMapper.toEntity(request, passwordEncoder));
-            return UserSignUpResponseDto.from(user);
+            return UserSignUpResponse.from(user);
         } catch (DataIntegrityViolationException e) {
             // username unique 제약 위반
             throw new BusinessException(UserErrorCode.DUPLICATE_USER);
@@ -65,18 +61,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserModifyResponseDto modifyUser(Long userId, UserModifyRequestDto request) {
-        if (userRepository.existsByUsername(request.getUsername())) {
+    public UserModifyResponse modifyUser(Long userId, UserModifyRequest request) {
+        if (userRepository.existsByUsername(request.username())) {
             throw new BusinessException(UserErrorCode.DUPLICATE_USERNAME);
         }
 
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
-        user.updateUsername(request.getUsername());
-        user.updatePassword(passwordEncoder.encode(request.getPassword()));
+        user.updateUsername(request.username());
+        user.updatePassword(passwordEncoder.encode(request.password()));
 
         userRepository.save(user);
 
-        return UserModifyResponseDto.from(user);
+        return UserModifyResponse.from(user);
     }
 }

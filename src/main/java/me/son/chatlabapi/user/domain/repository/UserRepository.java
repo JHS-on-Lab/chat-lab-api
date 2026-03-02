@@ -1,6 +1,7 @@
 package me.son.chatlabapi.user.domain.repository;
 
 import me.son.chatlabapi.user.domain.entity.User;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

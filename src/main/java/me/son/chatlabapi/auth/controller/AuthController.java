@@ -12,7 +12,7 @@ import me.son.chatlabapi.auth.jwt.service.JwtService;
 import me.son.chatlabapi.global.response.ApiResponse;
 import me.son.chatlabapi.global.security.CustomUserDetails;
 import me.son.chatlabapi.user.domain.service.UserService;
-import me.son.chatlabapi.user.dto.UserSearchResponseDto;
+import me.son.chatlabapi.user.dto.UserSearchResponse;
 
 import org.springframework.web.bind.annotation.*;
 
@@ -44,9 +44,9 @@ public class AuthController {
         log.info("reissue - user reissues tokens. refresh token: {}", refreshToken);
         Long id = jwtService.getSubject(refreshToken);
         // "DB 접속 최소화"보다 "토큰 재발급의 신뢰성"이 더 중요하다 판단되어 User 정보 재조회
-        UserSearchResponseDto user = userService.getUserById(id);
+        UserSearchResponse user = userService.getUserById(id);
 
-        JwtDto tokens = jwtService.createTokens(user.getId(), user.getUsername(), user.getRole());
+        JwtDto tokens = jwtService.createTokens(user.id(), user.username(), user.role());
         // Refresh Token 은 HTTP Only Cookie 저장
         addHttpOnlyCookie(response, "refreshToken", tokens.refreshToken());
 

@@ -8,7 +8,7 @@ import me.son.chatlabapi.global.config.AdminProperties;
 import me.son.chatlabapi.user.domain.entity.User;
 import me.son.chatlabapi.user.domain.entity.enums.Role;
 import me.son.chatlabapi.user.domain.repository.UserRepository;
-import me.son.chatlabapi.user.dto.UserSignUpRequestDto;
+import me.son.chatlabapi.user.dto.UserSignUpRequest;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -34,11 +34,7 @@ public class DataInitializer implements ApplicationRunner {
         String password = adminProperties.password();
 
         if (!userRepository.existsByUsername(username)) {
-            User user = toEntity(UserSignUpRequestDto.builder()
-                    .username(username)
-                    .password(password)
-                    .role(Role.ROLE_ADMIN)
-                    .build(), passwordEncoder);
+            User user = toEntity(new UserSignUpRequest(username, password, Role.ROLE_ADMIN), passwordEncoder);
             userRepository.save(user);
         }
 

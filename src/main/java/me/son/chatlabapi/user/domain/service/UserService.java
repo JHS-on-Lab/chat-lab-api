@@ -1,6 +1,7 @@
 package me.son.chatlabapi.user.domain.service;
 
 import me.son.chatlabapi.user.dto.*;
+
 import org.springframework.data.domain.Page;
 
 public interface UserService {
@@ -11,7 +12,7 @@ public interface UserService {
      * @param id 사용자 목록 조회 조건 및 페이징 정보
      * @return 페이징 정보가 포함된 사용자 목록
      */
-    UserSearchResponseDto getUserById(Long id);
+    UserSearchResponse getUserById(Long id);
 
     /**
      * 사용자 목록을 페이징하여 조회한다.
@@ -19,7 +20,7 @@ public interface UserService {
      * @param request 사용자 목록 조회 조건 및 페이징 정보
      * @return 페이징 정보가 포함된 사용자 목록
      */
-    Page<UserSearchResponseDto> getUsers(UserSearchRequestDto request);
+    Page<UserSearchResponse> getUsers(UserSearchRequest request);
 
     /**
      * 사용자명으로 사용자 정보 단건 조회합니다.
@@ -27,7 +28,7 @@ public interface UserService {
      * @param username 사용자명
      * @return 조회된 사용자 정보
      */
-    UserSearchResponseDto getUserByUsername(String username);
+    UserSearchResponse getUserByUsername(String username);
 
     /**
      * 새로운 사용자를 등록한다.
@@ -35,7 +36,7 @@ public interface UserService {
      * @param request 사용자 등록에 필요한 정보
      * @return 등록된 사용자 정보
      */
-    UserSignUpResponseDto addUser(UserSignUpRequestDto request);
+    UserSignUpResponse addUser(UserSignUpRequest request);
 
     /**
      * 기존 사용자 정보를 변경한다.
@@ -43,5 +44,5 @@ public interface UserService {
      * @param request 변경하려는 사용자 정보
      * @return 변경된 사용자 정보
      */
-    UserModifyResponseDto modifyUser(Long userId, UserModifyRequestDto request);
+    UserModifyResponse modifyUser(Long userId, UserModifyRequest request);
 }
