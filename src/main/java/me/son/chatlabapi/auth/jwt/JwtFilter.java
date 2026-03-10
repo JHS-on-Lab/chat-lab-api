@@ -12,6 +12,7 @@ import me.son.chatlabapi.auth.jwt.exception.CustomJwtException;
 import me.son.chatlabapi.auth.jwt.service.JwtService;
 import me.son.chatlabapi.global.security.CustomUserDetails;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -20,6 +21,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+
+import static me.son.chatlabapi.global.util.HttpRequestUtil.getClientIp;
 
 @Log4j2
 @Component
@@ -30,20 +33,21 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = resolveToken(request);
-        log.info("Access Token: {}", token);
 
-        if (StringUtils.hasText(token)) {
-            try {
-                // 파싱 및 검증
-                CustomUserDetails userDetails = jwtService.getCustomUserDetails(token);
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(auth);
-            } catch (CustomJwtException e) {
-                // Security 에서 예외 처리
-                SecurityContextHolder.clearContext();
-                request.setAttribute("JWT_EXCEPTION", e);
-            }
+        if (!StringUtils.hasText(token)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        try {
+            CustomUserDetails userDetails = jwtService.getCustomUserDetails(token);
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        } catch (CustomJwtException e) {
+            SecurityContextHolder.clearContext();
+            request.setAttribute("JWT_EXCEPTION", e);
+            log.warn("Invalid JWT - method={}, uri={}, ip={}, ua={}, message={}", request.getMethod(), request.getRequestURI(), getClientIp(request), request.getHeader("User-Agent"), e.getMessage());
         }
         filterChain.doFilter(request, response);
     }
@@ -59,6 +63,14 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String uri = request.getRequestURI();
-        return uri.startsWith("/oauth2/") || uri.startsWith("/login/oauth2/");
+        String method = request.getMethod();
+
+        return HttpMethod.OPTIONS.matches(method)
+                || uri.startsWith("/oauth2/")
+                || uri.startsWith("/login/oauth2/")
+                || uri.startsWith("/api/auth/")
+                || uri.startsWith("/h2-console/")
+                || uri.startsWith("/ws/")
+                || uri.startsWith("/error");
     }
 }

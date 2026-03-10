@@ -18,9 +18,12 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
+import static me.son.chatlabapi.global.util.HttpRequestUtil.getClientIp;
+
 @Log4j2
 @Component
 public class CustomAuthenticationEntryPoint extends AbstractSecurityErrorHandler implements AuthenticationEntryPoint {
+
     public CustomAuthenticationEntryPoint(ObjectMapper objectMapper) {
         super(objectMapper);
     }
@@ -29,13 +32,17 @@ public class CustomAuthenticationEntryPoint extends AbstractSecurityErrorHandler
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         Object jwtExObj = request.getAttribute("JWT_EXCEPTION");
 
+        String method = request.getMethod();
+        String uri = request.getRequestURI();
+        String ip = getClientIp(request);
+        String ua = request.getHeader("User-Agent");
+
         if (jwtExObj instanceof CustomJwtException jwtException) {
             JwtErrorCode errorCode = jwtException.getErrorCode();
-            log.warn("JWT Error: {}", errorCode.getMessage());
+            log.warn("JWT Error - method={}, uri={}, ip={}, ua={}, message={}", method, uri, ip, ua, errorCode.getMessage());
             writeErrorResponse(response, errorCode);
         } else {
-            // 일반 인증 실패 (토큰 없음, 잘못된 인증 등)
-            log.warn("Auth Error: {}", authException.getMessage());
+            log.warn("Auth Error - method={}, uri={}, ip={}, ua={}, message={}", method, uri, ip, ua, authException.getMessage());
             AuthErrorCode errorCode = AuthErrorCode.UNAUTHORIZED;
             writeErrorResponse(response, errorCode);
         }
