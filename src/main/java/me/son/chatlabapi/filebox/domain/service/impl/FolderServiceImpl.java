@@ -3,6 +3,7 @@ package me.son.chatlabapi.filebox.domain.service.impl;
 import lombok.RequiredArgsConstructor;
 
 import me.son.chatlabapi.filebox.domain.entity.Folder;
+import me.son.chatlabapi.filebox.domain.repository.FileItemRepository;
 import me.son.chatlabapi.filebox.domain.repository.FolderRepository;
 import me.son.chatlabapi.filebox.domain.service.FolderService;
 import me.son.chatlabapi.filebox.exception.FolderErrorCode;
@@ -21,6 +22,7 @@ import java.util.List;
 @Transactional
 public class FolderServiceImpl implements FolderService {
     private final FolderRepository folderRepository;
+    private final FileItemRepository fileItemRepository;
     private final UserRepository userRepository;
 
     @Override
@@ -44,5 +46,13 @@ public class FolderServiceImpl implements FolderService {
     public Folder getOwnedFolder(Long userId, Long folderId) {
         return folderRepository.findByIdAndUser_Id(folderId, userId)
                 .orElseThrow(() -> new BusinessException(FolderErrorCode.FOLDER_NOT_FOUND));
+    }
+
+    @Override
+    public void deleteFolder(Long userId, Long folderId) {
+        Folder folder = getOwnedFolder(userId, folderId);
+
+        fileItemRepository.deleteAllByFolder_Id(folder.getId());
+        folderRepository.delete(folder);
     }
 }

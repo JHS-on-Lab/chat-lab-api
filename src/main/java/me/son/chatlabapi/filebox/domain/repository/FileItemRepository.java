@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface FileItemRepository extends JpaRepository<FileItem, Long> {
     List<FileItem> findAllByFolder_IdOrderByCreatedAtAsc(Long folderId);
+
+    void deleteAllByFolder_Id(Long folderId);
 }

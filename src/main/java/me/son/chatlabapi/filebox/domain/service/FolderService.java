@@ -10,4 +10,6 @@ public interface FolderService {
     List<Folder> getMyFolders(Long userId);
 
     Folder getOwnedFolder(Long userId, Long folderId);
+
+    void deleteFolder(Long userId, Long folderId);
 }

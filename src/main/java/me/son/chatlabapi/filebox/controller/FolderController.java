@@ -70,6 +70,14 @@ public class FolderController {
         return ApiResponse.success(response);
     }
 
+    @DeleteMapping("/{folderId}")
+    public ApiResponse<Void> deleteFolder(@PathVariable Long folderId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("deleteFolder - user {} deletes folder {}", userDetails.getId(), folderId);
+        folderService.deleteFolder(userDetails.getId(), folderId);
+        return ApiResponse.success(null);
+    }
+
     @GetMapping("/{folderId}/download")
     public ResponseEntity<byte[]> downloadFolder(@PathVariable Long folderId,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
