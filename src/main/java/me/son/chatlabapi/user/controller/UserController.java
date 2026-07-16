@@ -1,5 +1,7 @@
 package me.son.chatlabapi.user.controller;
 
+import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -35,14 +37,14 @@ public class UserController {
     }
 
     @PostMapping
-    public ApiResponse<UserSignUpResponse> addUser(@RequestBody UserSignUpRequest request) {
+    public ApiResponse<UserSignUpResponse> addUser(@Valid @RequestBody UserSignUpRequest request) {
         log.info("addUser - admin user adds user {}.", request.username());
         UserSignUpResponse user = userService.addUser(request);
         return ApiResponse.success(user);
     }
 
     @PutMapping
-    public ApiResponse<UserModifyResponse> modifyUser(@RequestBody UserModifyRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ApiResponse<UserModifyResponse> modifyUser(@Valid @RequestBody UserModifyRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
         log.info("modifyUser - {} modifies my info.", userDetails.getUsername());
         UserModifyResponse user = userService.modifyUser(userDetails.getId(), request);
         return ApiResponse.success(user);

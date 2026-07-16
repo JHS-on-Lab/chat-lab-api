@@ -73,7 +73,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
-        ChatRoom room = chatRoomRepository.findById(roomId)
+        // 방 row 를 잠궈 동시에 나가는 마지막 멤버들 간의 정리 로직 경합을 방지한다.
+        ChatRoom room = chatRoomRepository.findByIdForUpdate(roomId)
                 .orElseThrow(() -> new BusinessException(ChatErrorCode.CHAT_ROOM_NOT_FOUND));
 
         ChatRoomMember membership = chatRoomMemberRepository.findByUserAndRoom(user, room)

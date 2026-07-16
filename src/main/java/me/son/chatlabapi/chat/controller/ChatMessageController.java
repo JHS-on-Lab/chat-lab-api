@@ -1,5 +1,6 @@
 package me.son.chatlabapi.chat.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import me.son.chatlabapi.chat.domain.service.ChatRoomMessageService;
@@ -27,7 +28,7 @@ public class ChatMessageController {
     }
 
     @PostMapping("/{roomId}/messages")
-    public ApiResponse<MessageResponse> sendMessage(@PathVariable Long roomId, @RequestBody SendMessageRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ApiResponse<MessageResponse> sendMessage(@PathVariable Long roomId, @Valid @RequestBody SendMessageRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
         log.info("sendMessage - user {} sends the message in the room {}", userDetails.getId(), roomId);
         MessageResponse response = chatRoomMessageService.sendMessage(roomId, userDetails.getId(), request);
         return ApiResponse.success(response);

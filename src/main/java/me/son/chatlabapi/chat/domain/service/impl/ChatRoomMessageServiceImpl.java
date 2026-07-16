@@ -59,6 +59,10 @@ public class ChatRoomMessageServiceImpl implements ChatRoomMessageService {
     public MessageResponse sendMessage(Long roomId, Long userId, SendMessageRequest request) {
         validateRoomMember(roomId, userId);
 
+        if (request.type() == null || request.content() == null) {
+            throw new BusinessException(ChatErrorCode.INVALID_MESSAGE_TYPE);
+        }
+
         ChatMessageType type;
         try {
             type = ChatMessageType.valueOf(request.type().toUpperCase());

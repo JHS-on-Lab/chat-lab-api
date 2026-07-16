@@ -34,7 +34,7 @@ public class AuthController {
 
         JwtDto tokens = jwtService.createTokens(user.getId(), user.getUsername(), user.getRole());
         // Refresh Token 은 HTTP Only Cookie 저장
-        addHttpOnlyCookie(response, "refreshToken", tokens.refreshToken());
+        addHttpOnlyCookie(response, "refreshToken", tokens.refreshToken(), jwtService.getRefreshTokenExpirationSeconds());
 
         return ApiResponse.success(tokens.accessToken());
     }
@@ -48,7 +48,7 @@ public class AuthController {
 
         JwtDto tokens = jwtService.createTokens(user.id(), user.username(), user.role());
         // Refresh Token 은 HTTP Only Cookie 저장
-        addHttpOnlyCookie(response, "refreshToken", tokens.refreshToken());
+        addHttpOnlyCookie(response, "refreshToken", tokens.refreshToken(), jwtService.getRefreshTokenExpirationSeconds());
 
         return ApiResponse.success(tokens.accessToken());
     }

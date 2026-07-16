@@ -9,18 +9,15 @@ import java.util.List;
 
 public interface GameScoreRepository extends JpaRepository<GameScore, Long> {
     @Query(value = """
-                SELECT gs.*
-                FROM game_scores gs
-                JOIN (
-                    SELECT user_id, MAX(score) AS max_score
-                    FROM game_scores
-                    WHERE game_name = :gameName
-                    GROUP BY user_id
-                ) t
-                ON gs.user_id = t.user_id
-                AND gs.score = t.max_score
-                WHERE gs.game_name = :gameName
-                ORDER BY gs.score DESC
+                SELECT ranked.*
+                FROM (
+                    SELECT gs.*,
+                           ROW_NUMBER() OVER (PARTITION BY gs.user_id ORDER BY gs.score DESC, gs.id ASC) AS rn
+                    FROM game_scores gs
+                    WHERE gs.game_name = :gameName
+                ) ranked
+                WHERE ranked.rn = 1
+                ORDER BY ranked.score DESC
                 LIMIT 10
             """, nativeQuery = true)
     List<GameScore> findTop10UserBestScore(@Param("gameName") String gameName);

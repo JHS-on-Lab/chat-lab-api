@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserModifyResponse modifyUser(Long userId, UserModifyRequest request) {
-        if (userRepository.existsByUsername(request.username())) {
+        if (userRepository.existsByUsernameAndIdNot(request.username(), userId)) {
             throw new BusinessException(UserErrorCode.DUPLICATE_USERNAME);
         }
 

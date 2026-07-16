@@ -1,5 +1,7 @@
 package me.son.chatlabapi.game.controller;
 
+import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,7 +24,7 @@ public class GameScoreController {
     private final GameScoreService gameScoreService;
 
     @PostMapping("/{gameName}/scores")
-    public ApiResponse<Void> saveScore(@PathVariable String gameName, @AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody ScoreRequest request) {
+    public ApiResponse<Void> saveScore(@PathVariable String gameName, @AuthenticationPrincipal CustomUserDetails userDetails, @Valid @RequestBody ScoreRequest request) {
         log.info("saveScore - {} saves a score of {} for the game {}.", userDetails.getUsername(), request.score(), gameName);
         gameScoreService.saveScore(gameName, userDetails.getId(), request.score());
         return ApiResponse.success(null);

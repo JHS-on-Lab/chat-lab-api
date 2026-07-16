@@ -1,6 +1,8 @@
 package me.son.chatlabapi.game.dto;
 
+import jakarta.validation.constraints.Min;
+
 public record ScoreRequest(
-        int score
+        @Min(value = 0, message = "점수는 0 이상이어야 합니다.") int score
 ) {
 }

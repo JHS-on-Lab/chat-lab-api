@@ -40,6 +40,15 @@ public class JwtService {
     }
 
     /**
+     * Refresh Token 쿠키의 만료 시간을 초 단위로 반환한다.
+     *
+     * @return Refresh Token 만료 시간(초)
+     */
+    public long getRefreshTokenExpirationSeconds() {
+        return refreshTokenExpirationMs / 1000;
+    }
+
+    /**
      * JWT 토큰을 검증하여 토큰의 Subject(User's ID) 를 반환한다
      *
      * @param token JWT 문자열
