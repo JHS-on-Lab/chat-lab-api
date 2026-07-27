@@ -12,6 +12,7 @@ import me.son.chatlabapi.filebox.dto.CreateFileRequest;
 import me.son.chatlabapi.filebox.dto.CreateFolderRequest;
 import me.son.chatlabapi.filebox.dto.FileResponse;
 import me.son.chatlabapi.filebox.dto.FolderResponse;
+import me.son.chatlabapi.filebox.dto.UpdateFileRequest;
 import me.son.chatlabapi.global.response.ApiResponse;
 import me.son.chatlabapi.global.security.CustomUserDetails;
 
@@ -63,6 +64,23 @@ public class FolderController {
                 .map(FileResponse::from)
                 .toList();
         return ApiResponse.success(response);
+    }
+
+    @PutMapping("/{folderId}/files/{fileId}")
+    public ApiResponse<FileResponse> updateFile(@PathVariable Long folderId, @PathVariable Long fileId,
+            @Valid @RequestBody UpdateFileRequest request,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("updateFile - user {} updates file {} in folder {}", userDetails.getId(), fileId, folderId);
+        FileResponse response = FileResponse.from(fileItemService.updateFile(userDetails.getId(), folderId, fileId, request));
+        return ApiResponse.success(response);
+    }
+
+    @DeleteMapping("/{folderId}/files/{fileId}")
+    public ApiResponse<Void> deleteFile(@PathVariable Long folderId, @PathVariable Long fileId,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("deleteFile - user {} deletes file {} in folder {}", userDetails.getId(), fileId, folderId);
+        fileItemService.deleteFile(userDetails.getId(), folderId, fileId);
+        return ApiResponse.success(null);
     }
 
     @DeleteMapping("/{folderId}")

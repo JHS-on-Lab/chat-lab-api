@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 public enum FolderErrorCode implements ErrorCode {
     FOLDER_NOT_FOUND(HttpStatus.NOT_FOUND, "FOLDER_NOT_FOUND", "존재하지 않는 폴더입니다."),
     INVALID_FOLDER_NAME(HttpStatus.BAD_REQUEST, "INVALID_FOLDER_NAME", "폴더 이름은 비어 있을 수 없습니다."),
+    FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "FILE_NOT_FOUND", "존재하지 않는 파일입니다."),
     ;
 
     private final HttpStatus status;

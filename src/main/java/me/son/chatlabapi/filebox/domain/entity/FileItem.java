@@ -44,4 +44,10 @@ public class FileItem {
         this.extension = extension;
         this.content = content;
     }
+
+    public void update(String title, String extension, String content) {
+        this.title = title;
+        this.extension = extension;
+        this.content = content == null ? "" : content;
+    }
 }

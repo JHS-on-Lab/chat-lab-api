@@ -8,6 +8,9 @@ import me.son.chatlabapi.filebox.domain.repository.FileItemRepository;
 import me.son.chatlabapi.filebox.domain.service.FileItemService;
 import me.son.chatlabapi.filebox.domain.service.FolderService;
 import me.son.chatlabapi.filebox.dto.CreateFileRequest;
+import me.son.chatlabapi.filebox.dto.UpdateFileRequest;
+import me.son.chatlabapi.filebox.exception.FolderErrorCode;
+import me.son.chatlabapi.global.exception.BusinessException;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,5 +44,28 @@ public class FileItemServiceImpl implements FileItemService {
         folderService.getOwnedFolder(userId, folderId);
 
         return fileItemRepository.findAllByFolder_IdOrderByCreatedAtAsc(folderId);
+    }
+
+    @Override
+    public FileItem updateFile(Long userId, Long folderId, Long fileId, UpdateFileRequest request) {
+        folderService.getOwnedFolder(userId, folderId);
+        FileItem fileItem = getOwnedFile(folderId, fileId);
+
+        fileItem.update(request.title(), request.extension(), request.content());
+
+        return fileItem;
+    }
+
+    @Override
+    public void deleteFile(Long userId, Long folderId, Long fileId) {
+        folderService.getOwnedFolder(userId, folderId);
+        FileItem fileItem = getOwnedFile(folderId, fileId);
+
+        fileItemRepository.delete(fileItem);
+    }
+
+    private FileItem getOwnedFile(Long folderId, Long fileId) {
+        return fileItemRepository.findByIdAndFolder_Id(fileId, folderId)
+                .orElseThrow(() -> new BusinessException(FolderErrorCode.FILE_NOT_FOUND));
     }
 }
