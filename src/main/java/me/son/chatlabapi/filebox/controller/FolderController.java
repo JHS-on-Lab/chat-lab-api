@@ -15,14 +15,9 @@ import me.son.chatlabapi.filebox.dto.FolderResponse;
 import me.son.chatlabapi.global.response.ApiResponse;
 import me.son.chatlabapi.global.security.CustomUserDetails;
 
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Slf4j
@@ -76,21 +71,5 @@ public class FolderController {
         log.info("deleteFolder - user {} deletes folder {}", userDetails.getId(), folderId);
         folderService.deleteFolder(userDetails.getId(), folderId);
         return ApiResponse.success(null);
-    }
-
-    @GetMapping("/{folderId}/download")
-    public ResponseEntity<byte[]> downloadFolder(@PathVariable Long folderId,
-            @AuthenticationPrincipal CustomUserDetails userDetails) {
-        log.info("downloadFolder - user {} downloads folder {}", userDetails.getId(), folderId);
-        Folder folder = folderService.getOwnedFolder(userDetails.getId(), folderId);
-        byte[] zip = fileItemService.downloadFolderAsZip(userDetails.getId(), folderId);
-
-        String encodedName = URLEncoder.encode(folder.getName() + ".zip", StandardCharsets.UTF_8)
-                .replace("+", "%20");
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + encodedName)
-                .body(zip);
     }
 }
