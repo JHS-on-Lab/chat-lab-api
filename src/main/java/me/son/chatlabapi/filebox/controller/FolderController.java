@@ -33,7 +33,7 @@ public class FolderController {
     public ApiResponse<FolderResponse> createFolder(@Valid @RequestBody CreateFolderRequest request,
             @AuthenticationPrincipal CustomUserDetails userDetails) {
         log.info("createFolder - user {} creates folder named {}", userDetails.getId(), request.name());
-        Folder folder = folderService.createFolder(userDetails.getId(), request.name());
+        Folder folder = folderService.createFolder(userDetails.getId(), request.name(), request.parentId());
         return ApiResponse.success(FolderResponse.from(folder));
     }
 

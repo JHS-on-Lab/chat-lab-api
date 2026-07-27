@@ -30,12 +30,21 @@ public class Folder {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_folder_id")
+    private Folder parentFolder;
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    public Folder(String name, User user) {
+    public Folder(String name, User user, Folder parentFolder) {
         this.name = name;
         this.user = user;
+        this.parentFolder = parentFolder;
+    }
+
+    public Long getParentFolderId() {
+        return parentFolder == null ? null : parentFolder.getId();
     }
 }

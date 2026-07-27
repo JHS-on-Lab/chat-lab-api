@@ -5,7 +5,7 @@ import me.son.chatlabapi.filebox.domain.entity.Folder;
 import java.util.List;
 
 public interface FolderService {
-    Folder createFolder(Long userId, String name);
+    Folder createFolder(Long userId, String name, Long parentId);
 
     List<Folder> getMyFolders(Long userId);
 
