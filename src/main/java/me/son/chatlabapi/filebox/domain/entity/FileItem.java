@@ -31,8 +31,7 @@ public class FileItem {
     @Column(nullable = false, length = 20)
     private String extension;
 
-    @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "MEDIUMTEXT")
     private String content;
 
     @CreatedDate
