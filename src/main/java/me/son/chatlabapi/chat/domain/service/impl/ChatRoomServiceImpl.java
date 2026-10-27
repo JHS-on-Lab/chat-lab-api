@@ -70,4 +70,24 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         }
     }
 
+    @Override
+    @Transactional
+    public void deleteAllByUser(Long userId) {
+        List<Long> roomIds = chatRoomMemberRepository.findRoomIdsByUserId(userId);
+
+        // leaveRoom / inviteMember 와의 경합 방지를 위해 참여 중인 방을 id 오름차순으로 잠근다 (데드락 방지)
+        roomIds.forEach(chatRoomRepository::findByIdForUpdate);
+
+        chatMessageRepository.deleteAllBySenderId(userId);
+        chatRoomMemberRepository.deleteAllByUserId(userId);
+
+        // 남은 멤버가 없는 방은 다른 사용자의 메시지까지 포함해 방째로 정리
+        for (Long roomId : roomIds) {
+            if (!chatRoomMemberRepository.existsByRoom_Id(roomId)) {
+                chatMessageRepository.deleteAllByRoomId(roomId);
+                chatRoomRepository.deleteById(roomId);
+            }
+        }
+    }
+
 }

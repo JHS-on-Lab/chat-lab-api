@@ -9,6 +9,7 @@ public record UserSearchResponse(
         Long id,
         String username,
         Role role,
+        boolean enabled,
         LocalDateTime createdAt
 ) {
 
@@ -17,6 +18,7 @@ public record UserSearchResponse(
                 user.getId(),
                 user.getUsername(),
                 user.getRole(),
+                user.isEnabled(),
                 user.getCreatedAt()
         );
     }

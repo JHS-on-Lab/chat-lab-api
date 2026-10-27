@@ -69,6 +69,13 @@ public class FolderServiceImpl implements FolderService {
         }
     }
 
+    @Override
+    public void deleteAllByUser(Long userId) {
+        fileItemRepository.deleteAllByOwnerId(userId);
+        folderRepository.detachParentsByUserId(userId);
+        folderRepository.deleteAllByUserId(userId);
+    }
+
     // BFS로 folder 자신 + 모든 하위 폴더를 부모 -> 자식 순서로 모은다.
     private List<Folder> collectSubtree(Long userId, Folder folder) {
         Map<Long, List<Folder>> childrenByParentId = folderRepository.findAllByUser_IdOrderByCreatedAtDesc(userId)

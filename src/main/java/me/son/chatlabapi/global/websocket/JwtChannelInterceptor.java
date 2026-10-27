@@ -11,6 +11,7 @@ import me.son.chatlabapi.chat.domain.repository.ChatRoomMemberRepository;
 import me.son.chatlabapi.chat.exception.ChatErrorCode;
 import me.son.chatlabapi.global.exception.BusinessException;
 import me.son.chatlabapi.global.security.CustomUserDetails;
+import me.son.chatlabapi.user.domain.repository.UserRepository;
 
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -35,6 +36,7 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
 
     private final JwtService jwtService;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
+    private final UserRepository userRepository;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -55,6 +57,10 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
 
             try {
                 CustomUserDetails userDetails = jwtService.getCustomUserDetails(token);
+                // Access Token 이 아직 유효하더라도 비활성화 / 삭제된 사용자의 신규 연결은 차단
+                if (!userRepository.existsByIdAndEnabledTrue(userDetails.getId())) {
+                    throw new BusinessException(AuthErrorCode.ACCOUNT_DISABLED);
+                }
                 Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails.getId(), null, userDetails.getAuthorities());
                 accessor.setUser(authentication);
             } catch (CustomJwtException e) {

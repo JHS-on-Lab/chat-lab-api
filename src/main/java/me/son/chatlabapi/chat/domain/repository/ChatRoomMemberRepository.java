@@ -4,6 +4,7 @@ import me.son.chatlabapi.chat.domain.entity.ChatRoom;
 import me.son.chatlabapi.chat.domain.entity.ChatRoomMember;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -23,4 +24,11 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
 
     @Query("SELECT m.user.username FROM ChatRoomMember m WHERE m.room.id = :roomId ORDER BY m.id ASC")
     List<String> findUsernamesByRoomId(@Param("roomId") Long roomId);
+
+    @Query("SELECT m.room.id FROM ChatRoomMember m WHERE m.user.id = :userId ORDER BY m.room.id ASC")
+    List<Long> findRoomIdsByUserId(@Param("userId") Long userId);
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("DELETE FROM ChatRoomMember m WHERE m.user.id = :userId")
+    void deleteAllByUserId(@Param("userId") Long userId);
 }

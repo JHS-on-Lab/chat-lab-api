@@ -46,6 +46,10 @@ public class SecurityConfig {
                         // 유저 생성 / 전체 목록 조회는 관리자 전용
                         .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
+                        // 다른 사용자 수정 / 활성화 상태 변경 / 삭제도 관리자 전용 (본인 수정은 PUT /api/users)
+                        .requestMatchers(HttpMethod.PUT, "/api/users/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/users/{id}/status").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/{id}").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 // JwtFilter 에서는 통과, 그 이후 Security 에서 발생하는 예외 처리

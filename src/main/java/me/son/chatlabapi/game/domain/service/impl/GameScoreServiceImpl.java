@@ -48,6 +48,11 @@ public class GameScoreServiceImpl implements GameScoreService {
                 .toList();
     }
 
+    @Override
+    public void deleteAllByUser(Long userId) {
+        gameScoreRepository.deleteAllByUserId(userId);
+    }
+
     private void validateActiveGame(String gameName) {
         Game game = gameRepository.findById(gameName)
                 .orElseThrow(() -> new BusinessException(GameErrorCode.GAME_NOT_FOUND));

@@ -22,11 +22,19 @@ public class CustomUserDetails implements UserDetails {
     private String password;
     @Getter
     private Role role;
+    private boolean enabled;
 
+    // JWT 에서 복원하는 경우: 비활성화 여부는 로그인 / 재발급 시점에 DB 로 검증하므로 활성 상태로 둔다.
     public CustomUserDetails(Long id, String username, Role role) {
         this.id = id;
         this.username = username;
         this.role = role;
+        this.enabled = true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
     }
 
     @Override

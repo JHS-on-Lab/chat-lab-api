@@ -11,6 +11,7 @@ import me.son.chatlabapi.global.security.CustomUserDetails;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -30,6 +31,8 @@ public class AuthServiceImpl implements AuthService {
             return (CustomUserDetails) authentication.getPrincipal();
         } catch (BadCredentialsException e) {
             throw new BusinessException(AuthErrorCode.INVALID_CREDENTIALS);
+        } catch (DisabledException e) {
+            throw new BusinessException(AuthErrorCode.ACCOUNT_DISABLED);
         } catch (AuthenticationException e) {
             throw new BusinessException(AuthErrorCode.UNAUTHORIZED);
         }

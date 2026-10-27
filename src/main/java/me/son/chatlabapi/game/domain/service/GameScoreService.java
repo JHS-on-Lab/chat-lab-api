@@ -8,4 +8,6 @@ public interface GameScoreService {
     void saveScore(String gameName, Long userId, int score);
 
     List<ScoreResponse> getTop10(String gameName);
+
+    void deleteAllByUser(Long userId);
 }

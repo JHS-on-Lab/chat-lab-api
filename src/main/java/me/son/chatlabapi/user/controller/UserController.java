@@ -50,6 +50,27 @@ public class UserController {
         return ApiResponse.success(user);
     }
 
+    @PutMapping("/{id}")
+    public ApiResponse<UserSearchResponse> modifyUserByAdmin(@PathVariable Long id, @Valid @RequestBody AdminUserModifyRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("modifyUserByAdmin - admin {} modifies user {}.", userDetails.getUsername(), id);
+        UserSearchResponse user = userService.modifyUserByAdmin(userDetails.getId(), id, request);
+        return ApiResponse.success(user);
+    }
+
+    @PatchMapping("/{id}/status")
+    public ApiResponse<UserSearchResponse> changeUserStatus(@PathVariable Long id, @Valid @RequestBody UserStatusRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("changeUserStatus - admin {} sets user {} enabled={}.", userDetails.getUsername(), id, request.enabled());
+        UserSearchResponse user = userService.changeUserStatus(userDetails.getId(), id, request.enabled());
+        return ApiResponse.success(user);
+    }
+
+    @DeleteMapping("/{id}")
+    public ApiResponse<Void> deleteUser(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("deleteUser - admin {} deletes user {}.", userDetails.getUsername(), id);
+        userService.deleteUser(userDetails.getId(), id);
+        return ApiResponse.success(null);
+    }
+
     @GetMapping("/me")
     public ApiResponse<UserSearchResponse> getMyInfo(@AuthenticationPrincipal CustomUserDetails userDetails) {
         log.info("getMyInfo - {} gets my info.", userDetails.getUsername());

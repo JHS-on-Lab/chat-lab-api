@@ -10,4 +10,9 @@ public interface ChatRoomService {
     List<MyRoomResponse> getMyRooms(Long userId);
 
     void leaveRoom(Long id, Long roomId);
+
+    /**
+     * 회원 삭제 시 사용자가 보낸 모든 메시지와 참여 정보를 삭제하고, 멤버가 남지 않은 방은 함께 정리한다.
+     */
+    void deleteAllByUser(Long userId);
 }
