@@ -28,8 +28,9 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class ChatRoomMessageServiceImpl implements ChatRoomMessageService {
     private static final int MAX_PAGE_SIZE = 100;
-    // 클라이언트 인코딩(Base64) 후 길이 기준. 프론트 입력 제한(20,000자)을 수용하는 크기
-    private static final int MAX_CONTENT_LENGTH = 100_000;
+    // 클라이언트 인코딩(Base64) 후 길이 기준. 프론트 입력 제한(30,000자)을 수용하는 크기
+    // 한글 30,000자 = UTF-8 90,000B -> Base64 120,000자 (WebSocket 메시지 한도 128KB 이내)
+    private static final int MAX_CONTENT_LENGTH = 125_000;
 
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
