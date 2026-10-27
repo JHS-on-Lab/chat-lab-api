@@ -18,17 +18,19 @@ import me.son.chatlabapi.user.domain.entity.User;
 import me.son.chatlabapi.user.domain.repository.UserRepository;
 
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ChatRoomMessageServiceImpl implements ChatRoomMessageService {
+    private static final int MAX_PAGE_SIZE = 100;
+    // 클라이언트 인코딩(Base64) 후 길이 기준. 프론트 입력 제한(20,000자)을 수용하는 크기
+    private static final int MAX_CONTENT_LENGTH = 100_000;
+
     private final UserRepository userRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
@@ -38,18 +40,19 @@ public class ChatRoomMessageServiceImpl implements ChatRoomMessageService {
     public MessageSliceResponse getMessages(Long roomId, Long cursor, int size, Long userId) {
         validateRoomMember(roomId, userId);
 
-        Pageable pageable = PageRequest.of(0, size);
+        // 과도한 조회 방지: 1 ~ MAX_PAGE_SIZE 로 제한
+        int pageSize = Math.clamp(size, 1, MAX_PAGE_SIZE);
 
-        List<ChatMessage> messages = chatMessageRepository.findMessages(roomId, cursor, pageable);
+        // id DESC 로 조회된 결과
+        List<ChatMessage> messages = chatMessageRepository.findMessages(roomId, cursor, PageRequest.of(0, pageSize));
 
-        boolean hasNext = messages.size() == size;
+        boolean hasNext = messages.size() == pageSize;
+        Long nextCursor = messages.isEmpty() ? null : messages.getLast().getId();
 
-        List<MessageResponse> dtoList = messages.stream()
+        // 화면 표시용으로 오래된 순(id ASC) 정렬
+        List<MessageResponse> dtoList = messages.reversed().stream()
                 .map(MessageResponse::from)
-                .sorted(Comparator.comparing(MessageResponse::id))
                 .toList();
-
-        Long nextCursor = messages.isEmpty() ? null : messages.get(messages.size() - 1).getId();
 
         return new MessageSliceResponse(dtoList, hasNext, nextCursor);
     }
@@ -59,8 +62,13 @@ public class ChatRoomMessageServiceImpl implements ChatRoomMessageService {
     public MessageResponse sendMessage(Long roomId, Long userId, SendMessageRequest request) {
         validateRoomMember(roomId, userId);
 
-        if (request.type() == null || request.content() == null) {
+        // WebSocket 경로는 @Valid 가 적용되지 않으므로 서비스에서 직접 검증
+        if (request.type() == null || request.content() == null || request.content().isBlank()) {
             throw new BusinessException(ChatErrorCode.INVALID_MESSAGE_TYPE);
+        }
+
+        if (request.content().length() > MAX_CONTENT_LENGTH) {
+            throw new BusinessException(ChatErrorCode.MESSAGE_TOO_LONG);
         }
 
         ChatMessageType type;
@@ -73,28 +81,14 @@ public class ChatRoomMessageServiceImpl implements ChatRoomMessageService {
         ChatRoom room = chatRoomRepository.getReferenceById(roomId);
         User sender = userRepository.getReferenceById(userId);
 
-        ChatMessage message = ChatMessage.create(
-                room,
-                sender,
-                type,
-                request.content()
-        );
+        ChatMessage saved = chatMessageRepository.save(ChatMessage.create(room, sender, type, request.content()));
 
-        ChatMessage saved = chatMessageRepository.save(message);
-
-        // Lazy 안전: sender.getUsername() 직접 사용
-        return MessageResponse.of(
-                saved.getId(),
-                userId,
-                sender.getUsername(),
-                saved.getContent(),
-                saved.getType(),
-                saved.getCreatedAt()
-        );
+        // 트랜잭션 안이므로 sender 프록시 초기화(username 조회) 안전
+        return MessageResponse.from(saved);
     }
 
     private void validateRoomMember(Long roomId, Long userId) {
-        if (!chatRoomMemberRepository.existsByRoomIdAndUserId(roomId, userId)) {
+        if (!chatRoomMemberRepository.existsByRoom_IdAndUser_Id(roomId, userId)) {
             throw new BusinessException(ChatErrorCode.NOT_ROOM_MEMBER);
         }
     }

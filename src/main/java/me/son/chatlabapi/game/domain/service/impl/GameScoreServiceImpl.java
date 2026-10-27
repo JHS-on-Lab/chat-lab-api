@@ -7,6 +7,7 @@ import me.son.chatlabapi.game.domain.entity.GameScore;
 import me.son.chatlabapi.game.domain.repository.GameRepository;
 import me.son.chatlabapi.game.domain.repository.GameScoreRepository;
 import me.son.chatlabapi.game.domain.service.GameScoreService;
+import me.son.chatlabapi.game.dto.ScoreResponse;
 import me.son.chatlabapi.game.exception.GameErrorCode;
 import me.son.chatlabapi.global.exception.BusinessException;
 import me.son.chatlabapi.user.domain.entity.User;
@@ -28,33 +29,31 @@ public class GameScoreServiceImpl implements GameScoreService {
 
     @Override
     public void saveScore(String gameName, Long userId, int score) {
-        // 1. 게임 존재 및 활성 여부 검증
-        Game game = gameRepository.findById(gameName)
-                .orElseThrow(() -> new BusinessException(GameErrorCode.GAME_NOT_FOUND));
+        validateActiveGame(gameName);
 
-        if (!game.isActive()) {
-            throw new BusinessException(GameErrorCode.GAME_INACTIVE);
-        }
-
-        // 2. 유저 조회
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
-        // 3. 점수 저장
-        GameScore gameScore = new GameScore(gameName, user, score);
-
-        gameScoreRepository.save(gameScore);
+        gameScoreRepository.save(new GameScore(gameName, user, score));
     }
 
     @Override
-    public List<GameScore> getTop10(String gameName) {
+    @Transactional(readOnly = true)
+    public List<ScoreResponse> getTop10(String gameName) {
+        validateActiveGame(gameName);
+
+        // user 가 LAZY 이므로 트랜잭션 안에서 DTO 로 변환
+        return gameScoreRepository.findTop10UserBestScore(gameName).stream()
+                .map(ScoreResponse::from)
+                .toList();
+    }
+
+    private void validateActiveGame(String gameName) {
         Game game = gameRepository.findById(gameName)
                 .orElseThrow(() -> new BusinessException(GameErrorCode.GAME_NOT_FOUND));
 
         if (!game.isActive()) {
             throw new BusinessException(GameErrorCode.GAME_INACTIVE);
         }
-
-        return gameScoreRepository.findTop10UserBestScore(gameName);
     }
 }

@@ -36,7 +36,7 @@ public class JwtService {
      * @return 생성된 JWT 토큰 정보
      */
     public JwtDto createTokens(Long id, String username, Role role) {
-        return new JwtDto(jwtProvider.createToken(id, username, role, accessTokenExpirationMs), jwtProvider.createToken(id, refreshTokenExpirationMs));
+        return new JwtDto(jwtProvider.createAccessToken(id, username, role, accessTokenExpirationMs), jwtProvider.createRefreshToken(id, refreshTokenExpirationMs));
     }
 
     /**
@@ -49,14 +49,18 @@ public class JwtService {
     }
 
     /**
-     * JWT 토큰을 검증하여 토큰의 Subject(User's ID) 를 반환한다
+     * Refresh Token 을 검증하여 토큰의 Subject(User's ID) 를 반환한다.
+     * Access Token 을 Refresh Token 으로 사용하는 것을 막기 위해 토큰 타입을 확인한다.
      *
-     * @param token JWT 문자열
+     * @param refreshToken Refresh Token 문자열
      * @return 인증된 사용자 ID
      */
-    public Long getSubject(String token) {
+    public Long getSubjectFromRefreshToken(String refreshToken) {
         try {
-            ParsedToken parsed = jwtProvider.parseToken(token);
+            ParsedToken parsed = jwtProvider.parseToken(refreshToken);
+            if (!isRefreshToken(parsed.claims())) {
+                throw new CustomJwtException(JwtErrorCode.JWT_INVALID);
+            }
             return Long.valueOf(parsed.subject());
         } catch (Exception e) {
             throw new CustomJwtException(JwtErrorCode.JWT_INVALID);
@@ -73,8 +77,11 @@ public class JwtService {
         try {
             // 파싱 및 검증
             ParsedToken parsed = jwtProvider.parseToken(token);
-            Long id = Long.valueOf(parsed.subject());
             Claims claims = parsed.claims();
+            if (isRefreshToken(claims)) {
+                throw new CustomJwtException(JwtErrorCode.JWT_INVALID);
+            }
+            Long id = Long.valueOf(parsed.subject());
             String username = claims.get("username", String.class);
             Role role = Role.valueOf(claims.get("role", String.class));
 
@@ -84,5 +91,14 @@ public class JwtService {
         } catch (Exception e) {
             throw new CustomJwtException(JwtErrorCode.JWT_INVALID);
         }
+    }
+
+    // type 클레임 도입 이전에 발급된 토큰은 role 클레임 유무로 구분한다 (refresh 토큰에는 role 이 없음)
+    private boolean isRefreshToken(Claims claims) {
+        String type = claims.get(JwtProvider.CLAIM_TYPE, String.class);
+        if (type != null) {
+            return JwtProvider.TYPE_REFRESH.equals(type);
+        }
+        return claims.get("role") == null;
     }
 }

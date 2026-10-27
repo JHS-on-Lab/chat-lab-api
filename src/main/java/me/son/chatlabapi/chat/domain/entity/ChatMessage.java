@@ -41,7 +41,7 @@ public class ChatMessage {
         this.createdAt = LocalDateTime.now();
     }
 
-    public ChatMessage(ChatRoom room, User sender, ChatMessageType type, String content) {
+    private ChatMessage(ChatRoom room, User sender, ChatMessageType type, String content) {
         this.room = room;
         this.sender = sender;
         this.type = type;
@@ -49,11 +49,6 @@ public class ChatMessage {
     }
 
     public static ChatMessage create(ChatRoom room, User sender, ChatMessageType type, String content) {
-        ChatMessage message = new ChatMessage();
-        message.room = room;
-        message.sender = sender;
-        message.type = type;
-        message.content = content;
-        return message;
+        return new ChatMessage(room, sender, type, content);
     }
 }

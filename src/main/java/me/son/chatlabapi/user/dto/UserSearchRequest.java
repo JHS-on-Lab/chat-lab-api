@@ -8,8 +8,11 @@ public record UserSearchRequest(
         Integer page,
         Integer size
 ) {
+    private static final int MAX_SIZE = 100;
+
     public UserSearchRequest {
-        if (page == null) page = 0;
-        if (size == null) size = 10;
+        if (page == null || page < 0) page = 0;
+        if (size == null || size < 1) size = 10;
+        if (size > MAX_SIZE) size = MAX_SIZE;
     }
 }

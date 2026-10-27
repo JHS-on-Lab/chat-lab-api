@@ -43,7 +43,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
+                        // 유저 생성 / 전체 목록 조회는 관리자 전용
                         .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 // JwtFilter 에서는 통과, 그 이후 Security 에서 발생하는 예외 처리
@@ -51,9 +53,9 @@ public class SecurityConfig {
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                         .accessDeniedHandler(customAccessDeniedHandler)
                 )
-                // H2 콘솔은 iframe 기반 UI → X-Frame-Options 설정 필요
+                // H2 콘솔은 iframe 기반 UI → 동일 출처 iframe 만 허용 (클릭재킹 방어 유지)
                 .headers(headers ->
-                        headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
+                        headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
                 )
                 // UsernamePasswordAuthenticationFilter 전에 JwtFilter 실행
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

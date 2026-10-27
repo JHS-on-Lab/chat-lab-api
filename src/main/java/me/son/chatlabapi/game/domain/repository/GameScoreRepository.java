@@ -17,7 +17,7 @@ public interface GameScoreRepository extends JpaRepository<GameScore, Long> {
                     WHERE gs.game_name = :gameName
                 ) ranked
                 WHERE ranked.rn = 1
-                ORDER BY ranked.score DESC
+                ORDER BY ranked.score DESC, ranked.id ASC
                 LIMIT 10
             """, nativeQuery = true)
     List<GameScore> findTop10UserBestScore(@Param("gameName") String gameName);

@@ -19,6 +19,10 @@ import java.util.Date;
 
 @Component
 public class JwtProvider {
+    public static final String CLAIM_TYPE = "type";
+    public static final String TYPE_ACCESS = "access";
+    public static final String TYPE_REFRESH = "refresh";
+
     @Value("${jwt.secret-key}")
     private String SECRET_KEY;
     private SecretKey key;
@@ -32,10 +36,11 @@ public class JwtProvider {
         key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String createToken(Long id, String username, Role role, long tokenExpirationMs) {
+    public String createAccessToken(Long id, String username, Role role, long tokenExpirationMs) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + tokenExpirationMs);
         return Jwts.builder().subject(String.valueOf(id))
+                .claim(CLAIM_TYPE, TYPE_ACCESS)
                 .claim("username", username)
                 .claim("role", role.name())
                 .issuedAt(now).expiration(expiry)
@@ -43,10 +48,11 @@ public class JwtProvider {
                 .compact();
     }
 
-    public String createToken(Long id, long tokenExpirationMs) {
+    public String createRefreshToken(Long id, long tokenExpirationMs) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + tokenExpirationMs);
         return Jwts.builder().subject(String.valueOf(id))
+                .claim(CLAIM_TYPE, TYPE_REFRESH)
                 .issuedAt(now).expiration(expiry)
                 .signWith(key)
                 .compact();

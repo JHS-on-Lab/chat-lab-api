@@ -33,10 +33,7 @@ public class GameScoreController {
     @GetMapping("/{gameName}/scores/top10")
     public ApiResponse<List<ScoreResponse>> getTop10(@PathVariable String gameName) {
         log.info("getTop10 - fetch the top 10 score rankings for the {} game.", gameName);
-        List<ScoreResponse> result = gameScoreService.getTop10(gameName)
-                .stream()
-                .map(ScoreResponse::from)
-                .toList();
+        List<ScoreResponse> result = gameScoreService.getTop10(gameName);
         return ApiResponse.success(result);
     }
 }

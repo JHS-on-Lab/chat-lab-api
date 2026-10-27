@@ -1,5 +1,7 @@
 package me.son.chatlabapi.chat.controller;
 
+import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.log4j.Log4j2;
@@ -22,7 +24,7 @@ public class ChatRoomController {
     private final ChatRoomService chatRoomService;
 
     @PostMapping
-    public ApiResponse<CreateRoomResponse> createRoom(@RequestBody CreateRoomRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ApiResponse<CreateRoomResponse> createRoom(@Valid @RequestBody CreateRoomRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
         log.info("createRoom - user {} creates new room named {}", userDetails.getId(), request.name());
         CreateRoomResponse response = chatRoomService.createRoom(userDetails.getId(), request.name());
         return ApiResponse.success(response);

@@ -33,6 +33,8 @@ jwt:
     refresh: 864000000
 
 app:
+  cookie:
+    secure: true
   cors:
     allowed-origins:
 #      - http://ec2-3-37-109-244.ap-northeast-2.compute.amazonaws.com

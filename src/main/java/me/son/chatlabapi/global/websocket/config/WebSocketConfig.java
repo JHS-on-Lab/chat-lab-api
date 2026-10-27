@@ -2,6 +2,7 @@ package me.son.chatlabapi.global.websocket.config;
 
 import lombok.RequiredArgsConstructor;
 
+import me.son.chatlabapi.global.config.CorsProperties;
 import me.son.chatlabapi.global.websocket.JwtChannelInterceptor;
 
 import org.springframework.context.annotation.Configuration;
@@ -17,11 +18,12 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final JwtChannelInterceptor jwtChannelInterceptor;
+    private final CorsProperties corsProperties;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws/chat")
-                .setAllowedOriginPatterns("*")
+                .setAllowedOrigins(corsProperties.allowedOrigins().toArray(String[]::new))
                 .withSockJS()
         ;
     }

@@ -34,6 +34,8 @@ jwt:
     refresh: 864000000
 
 app:
+  cookie:
+    secure: false
   cors:
     allowed-origins:
       - http://localhost:5173

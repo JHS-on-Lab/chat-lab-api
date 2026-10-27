@@ -1,5 +1,7 @@
 package me.son.chatlabapi.chat.controller;
 
+import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -29,8 +31,8 @@ public class ChatRoomMemberController {
     }
 
     @PostMapping("/{roomId}/members")
-    public ApiResponse<Void> inviteMember(@PathVariable Long roomId, @RequestBody InviteMemberRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
-        log.info("leaveRoom - user {} invites user {} to the room {}", userDetails.getId(), request.username(), roomId);
+    public ApiResponse<Void> inviteMember(@PathVariable Long roomId, @Valid @RequestBody InviteMemberRequest request, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("inviteMember - user {} invites user {} to the room {}", userDetails.getId(), request.username(), roomId);
         chatRoomMemberService.inviteMember(userDetails.getId(), roomId, request.username());
         return ApiResponse.success(null);
     }

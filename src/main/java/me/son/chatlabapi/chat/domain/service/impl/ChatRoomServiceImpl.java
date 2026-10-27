@@ -29,6 +29,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private final ChatMessageRepository chatMessageRepository;
 
     @Override
+    @Transactional
     public CreateRoomResponse createRoom(Long userId, String roomName) {
         if (roomName == null || roomName.isBlank()) {
             throw new BusinessException(ChatErrorCode.INVALID_ROOM_NAME);
@@ -36,58 +37,35 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
-        ChatRoom room = new ChatRoom(roomName);
-        chatRoomRepository.save(room);
+        ChatRoom room = chatRoomRepository.save(new ChatRoom(roomName.trim()));
+        chatRoomMemberRepository.save(new ChatRoomMember(user, room));
 
-        ChatRoomMember member = new ChatRoomMember(user, room);
-
-        chatRoomMemberRepository.save(member);
-
-        return new CreateRoomResponse(
-                room.getId(),
-                room.getName()
-        );
+        return new CreateRoomResponse(room.getId(), room.getName());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MyRoomResponse> getMyRooms(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
-
-        List<ChatRoomMember> memberships = chatRoomMemberRepository.findByUser(user);
-
-        return memberships.stream()
-                .map(member -> {
-                    ChatRoom room = member.getRoom();
-                    return new MyRoomResponse(
-                            room.getId(),
-                            room.getName()
-                    );
-                })
+        return chatRoomMemberRepository.findRoomsByUserId(userId).stream()
+                .map(room -> new MyRoomResponse(room.getId(), room.getName()))
                 .toList();
     }
 
     @Override
     @Transactional
     public void leaveRoom(Long userId, Long roomId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
-
         // 방 row 를 잠궈 동시에 나가는 마지막 멤버들 간의 정리 로직 경합을 방지한다.
-        ChatRoom room = chatRoomRepository.findByIdForUpdate(roomId)
+        chatRoomRepository.findByIdForUpdate(roomId)
                 .orElseThrow(() -> new BusinessException(ChatErrorCode.CHAT_ROOM_NOT_FOUND));
 
-        ChatRoomMember membership = chatRoomMemberRepository.findByUserAndRoom(user, room)
+        ChatRoomMember membership = chatRoomMemberRepository.findByRoom_IdAndUser_Id(roomId, userId)
                 .orElseThrow(() -> new BusinessException(ChatErrorCode.NOT_ROOM_MEMBER));
 
-        // 멤버 삭제
         chatRoomMemberRepository.delete(membership);
 
-        // 남은 멤버 존재 여부 확인
-        boolean hasRemaining = chatRoomMemberRepository.existsByRoom_Id(roomId);
-
-        if (!hasRemaining) {
-            chatMessageRepository.deleteByRoom_Id(roomId);
+        // 남은 멤버가 없으면 메시지와 방을 함께 정리
+        if (!chatRoomMemberRepository.existsByRoom_Id(roomId)) {
+            chatMessageRepository.deleteAllByRoomId(roomId);
             chatRoomRepository.deleteById(roomId);
         }
     }

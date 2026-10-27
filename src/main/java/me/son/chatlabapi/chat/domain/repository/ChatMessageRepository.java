@@ -4,6 +4,7 @@ import me.son.chatlabapi.chat.domain.entity.ChatMessage;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -20,5 +21,8 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
             """)
     List<ChatMessage> findMessages(@Param("roomId") Long roomId, @Param("cursor") Long cursor, Pageable pageable);
 
-    void deleteByRoom_Id(Long roomId);
+    // 파생 delete 는 엔티티를 전부 로딩 후 한 건씩 지우므로 벌크 삭제 사용
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("DELETE FROM ChatMessage m WHERE m.room.id = :roomId")
+    void deleteAllByRoomId(@Param("roomId") Long roomId);
 }

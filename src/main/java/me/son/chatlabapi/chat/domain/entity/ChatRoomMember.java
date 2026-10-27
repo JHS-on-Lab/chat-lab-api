@@ -1,6 +1,7 @@
 package me.son.chatlabapi.chat.domain.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import me.son.chatlabapi.user.domain.entity.User;
@@ -8,7 +9,7 @@ import me.son.chatlabapi.user.domain.entity.User;
 @Entity
 @Table(name = "chat_room_members", uniqueConstraints = { @UniqueConstraint(columnNames = {"user_id", "room_id"}) })
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatRoomMember {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

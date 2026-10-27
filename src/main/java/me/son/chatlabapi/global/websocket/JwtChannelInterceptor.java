@@ -3,6 +3,7 @@ package me.son.chatlabapi.global.websocket;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+import me.son.chatlabapi.auth.exception.AuthErrorCode;
 import me.son.chatlabapi.auth.jwt.exception.CustomJwtException;
 import me.son.chatlabapi.auth.jwt.exception.JwtErrorCode;
 import me.son.chatlabapi.auth.jwt.service.JwtService;
@@ -30,6 +31,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class JwtChannelInterceptor implements ChannelInterceptor {
     private static final Pattern ROOM_TOPIC_PATTERN = Pattern.compile("^/topic/chat/rooms/(\\d+)$");
+    private static final String APP_DESTINATION_PREFIX = "/app/";
 
     private final JwtService jwtService;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
@@ -59,13 +61,20 @@ public class JwtChannelInterceptor implements ChannelInterceptor {
                 log.error("WebSocket JWT validation failed", e);
                 throw e;
             }
+        } else if (StompCommand.SEND.equals(accessor.getCommand())) {
+            // 클라이언트가 브로커(/topic, /queue)로 직접 SEND 하면 서버 검증 없이 구독자에게 전달되어
+            // 다른 사용자를 사칭한 메시지 위조가 가능하므로, 애플리케이션 목적지(/app)만 허용한다.
+            String destination = accessor.getDestination();
+            if (destination == null || !destination.startsWith(APP_DESTINATION_PREFIX)) {
+                throw new BusinessException(AuthErrorCode.ACCESS_DENIED);
+            }
         } else if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
             Long roomId = extractRoomId(accessor.getDestination());
 
             if (roomId != null) {
                 Long userId = resolveUserId(accessor.getUser());
 
-                if (userId == null || !chatRoomMemberRepository.existsByRoomIdAndUserId(roomId, userId)) {
+                if (userId == null || !chatRoomMemberRepository.existsByRoom_IdAndUser_Id(roomId, userId)) {
                     throw new BusinessException(ChatErrorCode.NOT_ROOM_MEMBER);
                 }
             }
